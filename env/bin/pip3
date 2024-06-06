@@ -1,6 +1,4 @@
-#!/bin/sh
-'''exec' "/Users/elsie/Documents/Internship/Radical AI/GeminiExplorer/env/bin/python3" "$0" "$@"
-' '''
+#!/Users/elsie/Documents/Internship/RadicalAI/GeminiExplorer/env/bin/python3
 # -*- coding: utf-8 -*-
 import re
 import sys
