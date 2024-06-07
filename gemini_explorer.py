@@ -38,11 +38,15 @@ def llm_function(chat: ChatSession, query):
         }
     )
 
-st.title("Gemini Explorer")
+st.title("Elsie's Gemini Explorer")
+
+# Capture user name
+user_name = st.text_input("Please enter your name")
 
 #Initialize chat history
 if "messages" not in st.session_state:
     st.session_state.messages = []
+    st.session_state.initial_message_sent = False
     
 
 #Display and load to chat history
@@ -60,24 +64,10 @@ for index, message in enumerate(st.session_state.messages):
     chat.history.append(content) 
 
 #for initial message startup
-if len(st.session_state.messages) == 0:
-    initial_message = "Welcome to Elsie's Gemini Explorer! How can I assist you today?"
-    content = Content(
-        role="model",
-        parts=[Part.from_text(initial_message)]
-    )
-    chat.history.append(content)
-
-    with st.chat_message("model"):
-        st.markdown(initial_message)
-
-    st.session_state.messages.append(
-        {
-            "role": "model",
-            "content": initial_message
-        }
-
-    ) 
+if user_name and len(st.session_state.messages) == 0:
+    personalized_prompt = f"Ahoy {user_name}! I be ReX, yer friendly assistant. Let's set sail on our adventure together! 🦜⚓️"
+    llm_function(chat, personalized_prompt)
+    st.session_state.initial_message_sent = True
 
 #capturer user input
 query = st.chat_input("Gemini Explorer")
