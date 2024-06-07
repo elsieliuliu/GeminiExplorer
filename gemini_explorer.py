@@ -7,27 +7,81 @@ project = "elsiegeminiexplorer"
 vertexai.init(project = project)
 
 config = generative_models.GenerationConfig(
-    temperature=0.4,
-    top_k=40,
-    top_p=0.9
+    temperature=0.4
 )
 
 model = GenerativeModel(
     "gemini-pro",
-    generation_config = config,
-    
+    generation_config = config   
 )
 
 chat = model.start_chat()
 
-st.title('Gemini Explorer Chat')
+#helper function to display and send streamlit messages
+def llm_function(chat: ChatSession, query):
+    response = chat.send_message(query)
+    output = response.candidates[0].content.parts[0].text
 
-user_input = st.text_input("Type your message:")
+    with st.chat_message("model"):
+        st.markdown(output)
 
-if st.button('Send'):
-    if user_input:
-        response = chat.send_message(user_input)
-        st.text_area("Response:", value=response.candidates[0].content.parts[0].text, height=300)
-    else:
-        st.write("Please type a message to send.")
+    st.session_state.messages.append(
+        {
+            "role": "user",
+            "content": query
+        }
+    )
+    st.session_state.messages.append(
+        {
+            "role": "model",
+            "content": output
+        }
+    )
 
+st.title("Gemini Explorer")
+
+#Initialize chat history
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+    
+
+#Display and load to chat history
+
+for index, message in enumerate(st.session_state.messages):
+    content = Content(
+        role = message["role"],
+        parts=[ Part.from_text(message["content"])]
+    )
+
+    if index != 0:
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
+
+    chat.history.append(content) 
+
+#for initial message startup
+if len(st.session_state.messages) == 0:
+    initial_message = "Welcome to Elsie's Gemini Explorer! How can I assist you today?"
+    content = Content(
+        role="model",
+        parts=[Part.from_text(initial_message)]
+    )
+    chat.history.append(content)
+
+    with st.chat_message("model"):
+        st.markdown(initial_message)
+
+    st.session_state.messages.append(
+        {
+            "role": "model",
+            "content": initial_message
+        }
+
+    ) 
+
+#capturer user input
+query = st.chat_input("Gemini Explorer")
+if query:
+    with st.chat_message("user"):
+        st.markdown(query)
+    llm_function(chat, query)
