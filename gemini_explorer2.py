@@ -41,18 +41,20 @@ def llm_function(chat: ChatSession, query):
 # Function to send the personalized prompt
 def send_personalized_prompt(prompt):
     st.write(prompt)
+    st.session_state.initial_message_sent = True  # Update state to reflect message sent
 
 # Main part of the Streamlit app
 def main():
     st.title("Gemini Explorer")
 
-    # Add the code to capture the user's name
-    user_name = st.text_input("Ahoy, what's your name?")
+    # Check if the user's name is already stored; if not, ask for it
+    if "user_name" not in st.session_state or not st.session_state.user_name:
+        st.session_state.user_name = st.text_input("Ahoy, what's your name?", key="user_name_input")
 
     # Initialize chat history
     if "messages" not in st.session_state:
         st.session_state.messages = []
-        st.session_state.initial_message_sent = False  # Track if initial message was sent
+        st.session_state.initial_message_sent = False
 
     # Display and load chat history
     for index, message in enumerate(st.session_state.messages):
@@ -67,14 +69,10 @@ def main():
 
         chat.history.append(content)
 
-    # Check if the user has entered their name and the initial message hasn't been sent
-    if user_name and not st.session_state.initial_message_sent:
-        # Define the personalized prompt
-        personalized_prompt = f"Ahoy {user_name}! I be ReX, yer friendly assistant. Let's set sail on our adventure together! 🦜⚓️"
-        
-        # Send the personalized prompt
+    # If name is entered and initial message not sent, send personalized prompt
+    if st.session_state.user_name and not st.session_state.initial_message_sent:
+        personalized_prompt = f"Ahoy {st.session_state.user_name}! I be ReX, yer friendly assistant. Let's set sail on our adventure together! 🦜⚓️"
         send_personalized_prompt(personalized_prompt)
-        st.session_state.initial_message_sent = True
 
     # Capture user input
     query = st.chat_input("Gemini Explorer")
