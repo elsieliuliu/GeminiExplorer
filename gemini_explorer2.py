@@ -47,7 +47,7 @@ def main():
     st.title("Gemini Explorer")
 
     # Add the code to capture the user's name
-    user_name = st.text_input("Please enter your name")
+    user_name = st.text_input("Ahoy, what's your name?")
 
     # Initialize chat history
     if "messages" not in st.session_state:

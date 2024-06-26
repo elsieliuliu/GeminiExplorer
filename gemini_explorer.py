@@ -38,10 +38,10 @@ def llm_function(chat: ChatSession, query):
         }
     )
 
-st.title("Elsie's Gemini Explorer")
+st.title("Gemini Explorer")
 
 # Capture user name
-user_name = st.text_input("Please enter your name")
+user_name = st.text_input("May I know your name?")
 
 #Initialize chat history
 if "messages" not in st.session_state:
@@ -64,8 +64,9 @@ for index, message in enumerate(st.session_state.messages):
     chat.history.append(content) 
 
 #for initial message startup
-if user_name and len(st.session_state.messages) == 0:
-    personalized_prompt = f"Ahoy {user_name}! I be ReX, yer friendly assistant. Let's set sail on our adventure together! 🦜⚓️"
+
+if user_name and not st.session_state.initial_message_sent:
+    personalized_prompt = f"Your name is Rex, an assistant powered by Google Gemini. You greeting the user by {user_name}. And use emojis to be interactive"
     llm_function(chat, personalized_prompt)
     st.session_state.initial_message_sent = True
 
